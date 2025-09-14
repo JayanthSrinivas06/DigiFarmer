@@ -40,15 +40,20 @@ app.add_middleware(
 frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'frontend'))
 app.mount("/frontend", StaticFiles(directory=frontend_dir), name="frontend")
 
-# Initialize templates
-templates = Jinja2Templates(directory="frontend/templates")
+# Define base_dir before using it
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+templates_dir = os.path.join(base_dir, 'frontend', 'templates')
+templates = Jinja2Templates(directory=templates_dir)
 
 # Initialize the recommender
+
+# Use absolute paths for model files
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 try:
     recommender = CombinedCropSoilRecommender(
-        soil_model_path='model_outputs/soil_classifier_model.keras',
-        crop_model_path='model_outputs/crop_model.pkl',
-        crop_encoder_path='model_outputs/crop_label_encoder.pkl'
+        soil_model_path=os.path.join(base_dir, 'model_outputs', 'soil_classifier_model.keras'),
+        crop_model_path=os.path.join(base_dir, 'model_outputs', 'crop_model.pkl'),
+        crop_encoder_path=os.path.join(base_dir, 'model_outputs', 'crop_label_encoder.pkl')
     )
     print("✅ AI Models loaded successfully!")
 except Exception as e:

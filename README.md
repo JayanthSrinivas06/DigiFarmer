@@ -105,9 +105,6 @@ DigiFarmer/
 | `/api/health` | GET | System health check | < 50ms |
 | `/api/stats` | GET | System statistics | < 100ms |
 
-### API Documentation
-- **Interactive Docs**: `/api/docs` (Swagger UI)
-- **Alternative Docs**: `/api/redoc` (ReDoc)
 
 ## 🌍 Supported Soil Types & Crops
 
@@ -183,47 +180,6 @@ The AI system analyzes these critical factors:
 - **Async Processing**: Non-blocking request handling
 - **Error Handling**: Comprehensive error management
 
-## 📱 Mobile Support
-
-DigiFarmer is fully responsive and optimized for:
-
-- **📱 Mobile Phones**: Touch-friendly interface, optimized layouts
-- **📟 Tablets**: Adaptive grid systems, gesture support  
-- **💻 Desktops**: Full feature set with hover effects
-- **🖥️ Large Screens**: Expanded layouts with enhanced visuals
-
-## 🔒 Security & Privacy
-
-- **File Validation**: Strict image type and size checking
-- **Input Sanitization**: All user inputs are validated and sanitized
-- **Temporary Files**: Automatic cleanup of uploaded images
-- **No Data Storage**: Images are processed and immediately deleted
-- **HTTPS Ready**: SSL/TLS support for production deployment
-
-## 🚀 Deployment Options
-
-### Development
-```bash
-# Local development server
-python run_app.py
-```
-
-### Production
-```bash
-# Using Gunicorn (recommended)
-pip install gunicorn
-gunicorn backend.api.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
-
-# Using Docker
-docker build -t DigiFarmer .
-docker run -p 8000:8000 DigiFarmer
-```
-
-### Cloud Deployment
-- **Heroku**: Ready for one-click deployment
-- **AWS/GCP/Azure**: Container-ready with health checks
-- **Vercel/Netlify**: Static frontend with serverless backend
-
 ## 📈 Performance Metrics
 
 - **Image Processing**: 2-3 seconds average
@@ -231,69 +187,6 @@ docker run -p 8000:8000 DigiFarmer
 - **Concurrent Users**: Supports 100+ simultaneous users
 - **Memory Usage**: ~500MB with all models loaded
 - **Accuracy**: 85%+ soil classification accuracy
-
-## 🐛 Troubleshooting
-
-<details>
-<summary><strong>Common Issues & Solutions</strong></summary>
-
-### Models Not Loading
-```bash
-# Check if model files exist
-ls -la model_outputs/
-# Verify file permissions
-chmod 644 model_outputs/*.pkl model_outputs/*.keras
-```
-
-### Image Upload Fails
-- Verify image format (JPG, PNG, WebP only)
-- Check file size (must be < 10MB)
-- Ensure stable internet connection
-
-### Server Won't Start
-```bash
-# Install all dependencies
-pip install -r backend/requirements.txt
-# Check if port 8000 is available
-lsof -i :8000
-# Kill existing process if needed
-kill -9 $(lsof -t -i:8000)
-```
-
-### Poor Recommendations
-- Use clear, well-lit soil images
-- Avoid images with vegetation or debris
-- Provide accurate environmental parameters when possible
-
-</details>
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-### Development Setup
-```bash
-# Fork and clone the repository
-git clone https://github.com/your-username/DigiFarmer.git
-
-# Create a virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install development dependencies
-pip install -r backend/requirements.txt
-pip install -r requirements-dev.txt
-
-# Run tests
-pytest tests/
-
-# Start development server
-python run_app.py
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -304,10 +197,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **📧 Email**: support@DigiFarmer.com
-- **🐛 Issues**: [GitHub Issues](https://github.com/your-username/DigiFarmer/issues)
-- **💬 Discussions**: [GitHub Discussions](https://github.com/your-username/DigiFarmer/discussions)
-- **📚 Documentation**: [Wiki](https://github.com/your-username/DigiFarmer/wiki)
+- **📧 Email**: [jayanthsrinivas.b@gmail.com](jayanthsrinivas.b@gmail.com)
+- **💬 Discussions**: [GitHub Discussions](https://github.com/JayanthSrinivas06/DigiFarmer/discussions)
 
 ---
 

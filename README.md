@@ -1,21 +1,16 @@
-# 🌱 CropAI - AI-Powered Agricultural Intelligence
-
-<div align="center">
-
-![CropAI Logo](https://img.shields.io/badge/🌱-CropAI-green?style=for-the-badge&labelColor=2d3748&color=48bb78)
+# 🌱 DigiFarmer - AI-Powered Agricultural Intelligence
 
 **Transform your farming decisions with cutting-edge AI technology**
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue?style=flat-square&logo=python)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.10+-orange?style=flat-square&logo=tensorflow)](https://tensorflow.org)
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 
 </div>
 
 ## 🎯 Overview
 
-CropAI is a modern, AI-powered web application that revolutionizes agricultural decision-making by combining advanced computer vision and machine learning technologies. Upload a soil image and receive intelligent crop recommendations based on soil classification and environmental analysis.
+DigiFarmer is a modern, AI-powered web application that revolutionizes agricultural decision-making by combining advanced computer vision and machine learning technologies. Upload a soil image and receive intelligent crop recommendations based on soil classification and environmental analysis.
 
 ### ✨ Key Features
 
@@ -29,7 +24,7 @@ CropAI is a modern, AI-powered web application that revolutionizes agricultural 
 ## 🏗️ Project Architecture
 
 ```
-CropAI/
+DigiFarmer/
 ├── 📁 frontend/                    # Modern web interface
 │   ├── 📁 css/
 │   │   └── style.css              # Responsive styling with animations
@@ -63,8 +58,8 @@ CropAI/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/cropai.git
-   cd cropai
+   git clone https://github.com/your-username/DigiFarmer.git
+   cd DigiFarmer
    ```
 
 2. **Install dependencies**
@@ -190,7 +185,7 @@ The AI system analyzes these critical factors:
 
 ## 📱 Mobile Support
 
-CropAI is fully responsive and optimized for:
+DigiFarmer is fully responsive and optimized for:
 
 - **📱 Mobile Phones**: Touch-friendly interface, optimized layouts
 - **📟 Tablets**: Adaptive grid systems, gesture support  
@@ -220,8 +215,8 @@ pip install gunicorn
 gunicorn backend.api.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 
 # Using Docker
-docker build -t cropai .
-docker run -p 8000:8000 cropai
+docker build -t DigiFarmer .
+docker run -p 8000:8000 DigiFarmer
 ```
 
 ### Cloud Deployment
@@ -279,7 +274,7 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 ### Development Setup
 ```bash
 # Fork and clone the repository
-git clone https://github.com/your-username/cropai.git
+git clone https://github.com/your-username/DigiFarmer.git
 
 # Create a virtual environment
 python -m venv venv
@@ -309,10 +304,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **📧 Email**: support@cropai.com
-- **🐛 Issues**: [GitHub Issues](https://github.com/your-username/cropai/issues)
-- **💬 Discussions**: [GitHub Discussions](https://github.com/your-username/cropai/discussions)
-- **📚 Documentation**: [Wiki](https://github.com/your-username/cropai/wiki)
+- **📧 Email**: support@DigiFarmer.com
+- **🐛 Issues**: [GitHub Issues](https://github.com/your-username/DigiFarmer/issues)
+- **💬 Discussions**: [GitHub Discussions](https://github.com/your-username/DigiFarmer/discussions)
+- **📚 Documentation**: [Wiki](https://github.com/your-username/DigiFarmer/wiki)
 
 ---
 

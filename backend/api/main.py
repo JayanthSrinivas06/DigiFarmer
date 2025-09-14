@@ -36,8 +36,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files
-app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
+# Mount static files using absolute path
+frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'frontend'))
+app.mount("/frontend", StaticFiles(directory=frontend_dir), name="frontend")
 
 # Initialize templates
 templates = Jinja2Templates(directory="frontend/templates")

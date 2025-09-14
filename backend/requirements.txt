@@ -1,0 +1,14 @@
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+jinja2>=3.1.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+tensorflow>=2.10.0
+scikit-learn>=1.0.0
+pandas>=1.3.0
+numpy>=1.21.0
+Pillow>=8.0.0
+joblib>=1.0.0
+matplotlib>=3.5.0
+seaborn>=0.11.0

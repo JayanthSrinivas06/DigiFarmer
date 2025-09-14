@@ -16,6 +16,7 @@ const toastContainer = document.getElementById('toastContainer');
 document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
     loadSoilTypes();
+    initializeAnimations();
 });
 
 // Initialize event listeners
@@ -39,16 +40,58 @@ function initializeEventListeners() {
             scrollToSection(targetId);
         });
     });
+    
+    // Add hover effects to cards
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+}
+
+// Initialize animations
+function initializeAnimations() {
+    // Animate elements on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Observe cards and sections
+    document.querySelectorAll('.card, .feature-highlight').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
 }
 
 // Handle file selection
 function handleFileSelect(event) {
     const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
+        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+            showToast('File size too large. Please select an image under 10MB.', 'error');
+            return;
+        }
         selectedImage = file;
         displayImagePreview(file);
+        showToast('Image uploaded successfully!', 'success');
     } else {
-        showToast('Please select a valid image file', 'error');
+        showToast('Please select a valid image file (JPG, PNG, WebP)', 'error');
     }
 }
 
@@ -73,10 +116,15 @@ function handleDrop(event) {
     if (files.length > 0) {
         const file = files[0];
         if (file.type.startsWith('image/')) {
+            if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                showToast('File size too large. Please select an image under 10MB.', 'error');
+                return;
+            }
             selectedImage = file;
             displayImagePreview(file);
+            showToast('Image uploaded successfully!', 'success');
         } else {
-            showToast('Please select a valid image file', 'error');
+            showToast('Please select a valid image file (JPG, PNG, WebP)', 'error');
         }
     }
 }
@@ -88,6 +136,15 @@ function displayImagePreview(file) {
         previewImage.src = e.target.result;
         uploadArea.style.display = 'none';
         uploadPreview.style.display = 'block';
+        
+        // Add animation
+        uploadPreview.style.opacity = '0';
+        uploadPreview.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+            uploadPreview.style.transition = 'all 0.3s ease';
+            uploadPreview.style.opacity = '1';
+            uploadPreview.style.transform = 'scale(1)';
+        }, 100);
     };
     reader.readAsDataURL(file);
 }
@@ -96,18 +153,41 @@ function displayImagePreview(file) {
 function removeImage() {
     selectedImage = null;
     imageInput.value = '';
-    uploadArea.style.display = 'block';
-    uploadPreview.style.display = 'none';
-    previewImage.src = '';
+    
+    // Animate out
+    uploadPreview.style.transition = 'all 0.3s ease';
+    uploadPreview.style.opacity = '0';
+    uploadPreview.style.transform = 'scale(0.8)';
+    
+    setTimeout(() => {
+        uploadArea.style.display = 'block';
+        uploadPreview.style.display = 'none';
+        previewImage.src = '';
+        
+        // Animate in
+        uploadArea.style.opacity = '0';
+        uploadArea.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+            uploadArea.style.transition = 'all 0.3s ease';
+            uploadArea.style.opacity = '1';
+            uploadArea.style.transform = 'scale(1)';
+        }, 100);
+    }, 300);
+    
+    showToast('Image removed', 'success');
 }
 
 // Perform analysis
 async function performAnalysis() {
     if (!selectedImage) {
         showToast('Please select an image first', 'error');
+        scrollToSection('analysis');
         return;
     }
     
+    // Disable button and show loading
+    analyzeBtn.disabled = true;
+    analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
     showLoading(true);
     
     try {
@@ -130,15 +210,22 @@ async function performAnalysis() {
         if (result.success) {
             analysisResults = result;
             displayResults(result);
-            showToast('Analysis completed successfully!', 'success');
+            showToast('Analysis completed successfully! 🎉', 'success');
+            
+            // Scroll to results with delay
+            setTimeout(() => {
+                scrollToSection('results');
+            }, 500);
         } else {
-            showToast(result.detail || 'Analysis failed', 'error');
+            showToast(result.detail || 'Analysis failed. Please try again.', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        showToast('An error occurred during analysis', 'error');
+        showToast('Network error. Please check your connection and try again.', 'error');
     } finally {
         showLoading(false);
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerHTML = '<i class="fas fa-magic"></i> Analyze Soil & Get Recommendations';
     }
 }
 
@@ -150,8 +237,11 @@ function getEnvironmentalParameters() {
     inputs.forEach(input => {
         const value = document.getElementById(input).value;
         if (value && value.trim() !== '') {
-            const paramName = input === 'ph' ? 'pH' : input.charAt(0).toUpperCase() + input.slice(1);
-            params[paramName] = parseFloat(value);
+            const numValue = parseFloat(value);
+            if (!isNaN(numValue)) {
+                const paramName = input === 'ph' ? 'pH' : input.charAt(0).toUpperCase() + input.slice(1);
+                params[paramName] = numValue;
+            }
         }
     });
     
@@ -160,9 +250,16 @@ function getEnvironmentalParameters() {
 
 // Display results
 function displayResults(result) {
-    // Show results section
+    // Show results section with animation
     resultsSection.style.display = 'block';
-    resultsSection.scrollIntoView({ behavior: 'smooth' });
+    resultsSection.style.opacity = '0';
+    resultsSection.style.transform = 'translateY(30px)';
+    
+    setTimeout(() => {
+        resultsSection.style.transition = 'all 0.6s ease';
+        resultsSection.style.opacity = '1';
+        resultsSection.style.transform = 'translateY(0)';
+    }, 100);
     
     // Update soil analysis
     document.getElementById('soilType').textContent = result.soil_type || 'Unknown';
@@ -177,6 +274,17 @@ function displayResults(result) {
     
     // Update soil-specific crops
     displaySoilSpecificCrops(result.soil_specific_crops);
+    
+    // Add confidence color coding
+    const confidenceElement = document.getElementById('soilConfidence');
+    const confidence = result.soil_confidence;
+    if (confidence >= 80) {
+        confidenceElement.style.color = '#48bb78';
+    } else if (confidence >= 60) {
+        confidenceElement.style.color = '#ed8936';
+    } else {
+        confidenceElement.style.color = '#e53e3e';
+    }
 }
 
 // Display environmental conditions
@@ -187,20 +295,22 @@ function displayEnvironmentalConditions(envParams) {
     if (!envParams) return;
     
     const envItems = [
-        { key: 'N', label: 'Nitrogen', unit: 'ppm' },
-        { key: 'P', label: 'Phosphorus', unit: 'ppm' },
-        { key: 'K', label: 'Potassium', unit: 'ppm' },
-        { key: 'temperature', label: 'Temperature', unit: '°C' },
-        { key: 'humidity', label: 'Humidity', unit: '%' },
-        { key: 'pH', label: 'pH Level', unit: '' },
-        { key: 'rainfall', label: 'Rainfall', unit: 'mm' }
+        { key: 'N', label: 'Nitrogen', unit: 'ppm', icon: 'fas fa-atom' },
+        { key: 'P', label: 'Phosphorus', unit: 'ppm', icon: 'fas fa-flask' },
+        { key: 'K', label: 'Potassium', unit: 'ppm', icon: 'fas fa-vial' },
+        { key: 'temperature', label: 'Temperature', unit: '°C', icon: 'fas fa-thermometer-half' },
+        { key: 'humidity', label: 'Humidity', unit: '%', icon: 'fas fa-tint' },
+        { key: 'pH', label: 'pH Level', unit: '', icon: 'fas fa-balance-scale' },
+        { key: 'rainfall', label: 'Rainfall', unit: 'mm', icon: 'fas fa-cloud-rain' }
     ];
     
-    envItems.forEach(item => {
+    envItems.forEach((item, index) => {
         if (envParams[item.key] !== undefined) {
             const envItem = document.createElement('div');
             envItem.className = 'env-item';
+            envItem.style.animationDelay = `${index * 0.1}s`;
             envItem.innerHTML = `
+                <i class="${item.icon}" style="font-size: 1.5rem; color: #48bb78; margin-bottom: 0.5rem;"></i>
                 <span class="value">${envParams[item.key].toFixed(1)}${item.unit}</span>
                 <span class="label">${item.label}</span>
             `;
@@ -215,24 +325,26 @@ function displayCropRecommendations(recommendations) {
     cropsGrid.innerHTML = '';
     
     if (!recommendations || recommendations.length === 0) {
-        cropsGrid.innerHTML = '<p>No recommendations available</p>';
+        cropsGrid.innerHTML = '<p style="text-align: center; color: #718096; font-size: 1.1rem;">No recommendations available</p>';
         return;
     }
     
     recommendations.forEach((rec, index) => {
         const cropItem = document.createElement('div');
         cropItem.className = `crop-item ${rec.soil_suitable ? 'suitable' : 'not-suitable'}`;
+        cropItem.style.animationDelay = `${index * 0.1}s`;
         
         const indicator = rec.soil_suitable ? '✅' : '⚠️';
         const suitability = rec.soil_suitable ? 'Highly Suitable' : 'Moderately Suitable';
+        const scoreColor = rec.soil_suitable ? '#48bb78' : '#ed8936';
         
         cropItem.innerHTML = `
             <div class="crop-name">
-                <span>${indicator}</span>
+                <span style="font-size: 1.2rem;">${indicator}</span>
                 <span>${rec.crop.charAt(0).toUpperCase() + rec.crop.slice(1)}</span>
-                <small style="color: #666; margin-left: 0.5rem;">(${suitability})</small>
+                <small style="color: #718096; margin-left: 0.5rem; font-weight: 500;">(${suitability})</small>
             </div>
-            <div class="crop-score">
+            <div class="crop-score" style="color: ${scoreColor};">
                 ${(rec.score * 100).toFixed(1)}%
             </div>
         `;
@@ -247,13 +359,14 @@ function displaySoilSpecificCrops(soilCrops) {
     soilCropsContainer.innerHTML = '';
     
     if (!soilCrops || soilCrops.length === 0) {
-        soilCropsContainer.innerHTML = '<p>No soil-specific crops available</p>';
+        soilCropsContainer.innerHTML = '<p style="text-align: center; color: #718096; font-size: 1.1rem;">No soil-specific crops available</p>';
         return;
     }
     
-    soilCrops.forEach(crop => {
+    soilCrops.forEach((crop, index) => {
         const tag = document.createElement('span');
         tag.className = 'soil-crop-tag';
+        tag.style.animationDelay = `${index * 0.1}s`;
         tag.textContent = crop.charAt(0).toUpperCase() + crop.slice(1);
         soilCropsContainer.appendChild(tag);
     });
@@ -288,7 +401,20 @@ function showLoading(show) {
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    toast.textContent = message;
+    
+    // Add icon based on type
+    const icons = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        info: 'fas fa-info-circle'
+    };
+    
+    toast.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="${icons[type] || icons.info}" style="color: ${type === 'success' ? '#48bb78' : type === 'error' ? '#e53e3e' : '#4299e1'};"></i>
+            <span>${message}</span>
+        </div>
+    `;
     
     toastContainer.appendChild(toast);
     
@@ -306,13 +432,13 @@ function showToast(message, type = 'info') {
 function scrollToSection(sectionId) {
     const section = document.getElementById(sectionId);
     if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
+        const navHeight = document.querySelector('.navbar').offsetHeight;
+        const targetPosition = section.offsetTop - navHeight - 20;
         
-        // Update active nav link
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
+        window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
         });
-        document.querySelector(`[href="#${sectionId}"]`).classList.add('active');
     }
 }
 
@@ -335,49 +461,53 @@ function downloadResults() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    showToast('Report downloaded successfully!', 'success');
+    showToast('Report downloaded successfully! 📄', 'success');
 }
 
 // Generate text report
 function generateReport(results) {
     const timestamp = new Date().toLocaleString();
     
-    let report = `CROP & SOIL ANALYSIS REPORT
+    let report = `🌱 CROP & SOIL ANALYSIS REPORT
 Generated on: ${timestamp}
 
-SOIL ANALYSIS:
-==============
+═══════════════════════════════════════════════════════════════
+
+🔬 SOIL ANALYSIS:
 Soil Type: ${results.soil_type || 'Unknown'}
 Confidence: ${results.soil_confidence ? results.soil_confidence.toFixed(1) + '%' : 'Unknown'}
 
-ENVIRONMENTAL CONDITIONS:
-========================
+🌡️ ENVIRONMENTAL CONDITIONS:
 `;
     
     if (results.environmental_parameters) {
         Object.entries(results.environmental_parameters).forEach(([key, value]) => {
-            report += `${key}: ${value}\n`;
+            const units = {
+                'N': 'ppm', 'P': 'ppm', 'K': 'ppm',
+                'temperature': '°C', 'humidity': '%', 'pH': '', 'rainfall': 'mm'
+            };
+            report += `${key}: ${value}${units[key] || ''}\n`;
         });
     }
     
-    report += `\nRECOMMENDED CROPS:
-==================
+    report += `\n🌾 RECOMMENDED CROPS:
 `;
     
     if (results.recommendations) {
         results.recommendations.forEach((rec, index) => {
-            const suitability = rec.soil_suitable ? 'Highly Suitable' : 'Moderately Suitable';
+            const suitability = rec.soil_suitable ? 'Highly Suitable ✅' : 'Moderately Suitable ⚠️';
             report += `${index + 1}. ${rec.crop.charAt(0).toUpperCase() + rec.crop.slice(1)} (${suitability}) - Score: ${(rec.score * 100).toFixed(1)}%\n`;
         });
     }
     
     if (results.soil_specific_crops && results.soil_specific_crops.length > 0) {
-        report += `\nSOIL-SPECIFIC CROPS:
-===================
-${results.soil_specific_crops.map(crop => crop.charAt(0).toUpperCase() + crop.slice(1)).join(', ')}\n`;
+        report += `\n🌱 SOIL-SPECIFIC CROPS:
+${results.soil_specific_crops.map(crop => `• ${crop.charAt(0).toUpperCase() + crop.slice(1)}`).join('\n')}\n`;
     }
     
-    report += `\n--- End of Report ---`;
+    report += `\n═══════════════════════════════════════════════════════════════
+Generated by CropAI - AI-Powered Agricultural Recommendations
+`;
     
     return report;
 }
@@ -391,14 +521,48 @@ function capitalizeFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+// Add smooth reveal animation for results
+function animateResults() {
+    const resultCards = document.querySelectorAll('.result-card');
+    resultCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 200);
+    });
+}
+
 // Error handling
 window.addEventListener('error', function(e) {
     console.error('Global error:', e.error);
-    showToast('An unexpected error occurred', 'error');
+    showToast('An unexpected error occurred. Please refresh and try again.', 'error');
 });
 
 // Handle unhandled promise rejections
 window.addEventListener('unhandledrejection', function(e) {
     console.error('Unhandled promise rejection:', e.reason);
-    showToast('An error occurred while processing your request', 'error');
+    showToast('A network error occurred. Please check your connection.', 'error');
+});
+
+// Add keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl/Cmd + U to upload image
+    if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+        e.preventDefault();
+        imageInput.click();
+    }
+    
+    // Ctrl/Cmd + Enter to analyze
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        performAnalysis();
+    }
+    
+    // Escape to close loading overlay
+    if (e.key === 'Escape' && loadingOverlay.classList.contains('show')) {
+        showLoading(false);
+    }
 });

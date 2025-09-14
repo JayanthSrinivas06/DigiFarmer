@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱 CropAI - AI-Powered Agricultural Recommendations</title>
+    <meta name="description" content="Get intelligent crop recommendations based on soil analysis and environmental conditions using advanced AI technology.">
+    <link rel="stylesheet" href="/frontend/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#home" class="nav-logo">
+                <i class="fas fa-seedling"></i>
+                <span>CropAI</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <h1 class="hero-title">
+                AI-Powered Agricultural
+                <span class="gradient-text">Intelligence</span>
+            </h1>
+            <p class="hero-description">
+                Transform your farming decisions with cutting-edge AI technology. Upload a soil image and get 
+                intelligent crop recommendations based on advanced computer vision and machine learning algorithms.
+            </p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary btn-large" onclick="scrollToSection('analysis')">
+                    <i class="fas fa-rocket"></i>
+                    Start Analysis
+                </button>
+                <button class="btn btn-secondary btn-large" onclick="window.open('https://github.com/cropai', '_blank')">
+                    <i class="fab fa-github"></i>
+                    View on GitHub
+                </button>
+            </div>
+            
+            <div class="hero-features">
+                <div class="feature-highlight">
+                    <i class="fas fa-microscope"></i>
+                    <h3>Soil Classification</h3>
+                    <p>Advanced ResNet50 computer vision model for accurate soil type identification</p>
+                </div>
+                <div class="feature-highlight">
+                    <i class="fas fa-brain"></i>
+                    <h3>AI Recommendations</h3>
+                    <p>Machine learning algorithms trained on agricultural data for optimal crop suggestions</p>
+                </div>
+                <div class="feature-highlight">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Environmental Analysis</h3>
+                    <p>Comprehensive analysis of N, P, K, temperature, humidity, pH, and rainfall factors</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Section -->
+    <section id="analysis" class="analysis-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Agricultural Analysis</h2>
+                <p>Upload your soil image and get intelligent crop recommendations powered by AI</p>
+            </div>
+
+            <div class="analysis-container">
+                <!-- Upload Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Upload Soil Image</h3>
+                        <p>JPG, PNG, WebP • Max 10MB</p>
+                    </div>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <i class="fas fa-image"></i>
+                            <p>Drag & drop your soil image here</p>
+                            <p class="upload-subtext">or click to browse files</p>
+                            <input type="file" id="imageInput" accept="image/*" hidden>
+                        </div>
+                    </div>
+                    <div class="upload-preview" id="uploadPreview" style="display: none;">
+                        <img id="previewImage" src="" alt="Soil Preview">
+                        <button class="btn-remove" onclick="removeImage()" title="Remove image">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Environmental Parameters -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-sliders-h"></i>
+                        <h3>Environmental Parameters</h3>
+                        <p>Optional: Customize environmental conditions</p>
+                    </div>
+                    <div class="parameters-grid">
+                        <div class="parameter-group">
+                            <label for="nitrogen">
+                                <i class="fas fa-atom" style="margin-right: 0.5rem; color: #48bb78;"></i>
+                                Nitrogen (N)
+                            </label>
+                            <input type="number" id="nitrogen" placeholder="e.g., 70" min="0" max="200">
+                            <span class="unit">ppm</span>
+                        </div>
+                        <div class="parameter-group">
+                            <label for="phosphorus">
+                                <i class="fas fa-flask" style="margin-right: 0.5rem; color: #48bb78;"></i>
+                                Phosphorus (P)
+                            </label>
+                            <input type="number" id="phosphorus" placeholder="e.g., 45" min="0" max="100">
+                            <span class="unit">ppm</span>
+                        </div>
+                        <div class="parameter-group">
+                            <label for="potassium">
+                                <i class="fas fa-vial" style="margin-right: 0.5rem; color: #48bb78;"></i>
+                                Potassium (K)
+                            </label>
+                            <input type="number" id="potassium" placeholder="e.g., 55" min="0" max="150">
+                            <span class="unit">ppm</span>
+                        </div>
+                        <div class="parameter-group">
+                            <label for="temperature">
+                                <i class="fas fa-thermometer-half" style="margin-right: 0.5rem; color: #48bb78;"></i>
+                                Temperature
+                            </label>
+                            <input type="number" id="temperature" placeholder="e.g., 30" min="-10" max="50">
+                            <span class="unit">°C</span>
+                        </div>
+                        <div class="parameter-group">
+                            <label for="humidity">
+                                <i class="fas fa-tint" style="margin-right: 0.5rem; color: #48bb78;"></i>
+                                Humidity
+                            </label>
+                            <input type="number" id="humidity" placeholder="e.g., 75" min="0" max="100">
+                            <span class="unit">%</span>
+                        </div>
+                        <div class="parameter-group">
+                            <label for="ph">
+                                <i class="fas fa-balance-scale" style="margin-right: 0.5rem; color: #48bb78;"></i>
+                                pH Level
+                            </label>
+                            <input type="number" id="ph" placeholder="e.g., 7.0" step="0.1" min="0" max="14">
+                        </div>
+                        <div class="parameter-group">
+                            <label for="rainfall">
+                                <i class="fas fa-cloud-rain" style="margin-right: 0.5rem; color: #48bb78;"></i>
+                                Rainfall
+                            </label>
+                            <input type="number" id="rainfall" placeholder="e.g., 250" min="0" max="1000">
+                            <span class="unit">mm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analysis Button -->
+                <div class="analysis-actions">
+                    <button class="btn btn-primary btn-large" id="analyzeBtn" onclick="performAnalysis()">
+                        <i class="fas fa-magic"></i>
+                        Analyze Soil & Get Recommendations
+                    </button>
+                    <p style="margin-top: 1rem; color: #718096; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i>
+                        Analysis typically takes 2-5 seconds • Keyboard shortcut: Ctrl+Enter
+                    </p>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h3>
+                        <i class="fas fa-chart-bar" style="margin-right: 0.5rem;"></i>
+                        Analysis Results
+                    </h3>
+                    <button class="btn btn-secondary" onclick="downloadResults()">
+                        <i class="fas fa-download"></i>
+                        Download Report
+                    </button>
+                </div>
+
+                <!-- Soil Analysis Results -->
+                <div class="result-card" id="soilResult">
+                    <div class="card-header">
+                        <i class="fas fa-microscope"></i>
+                        <h4>Soil Classification</h4>
+                    </div>
+                    <div class="result-content">
+                        <div class="soil-info">
+                            <div class="soil-type">
+                                <span class="label">
+                                    <i class="fas fa-layer-group" style="margin-right: 0.5rem;"></i>
+                                    Soil Type:
+                                </span>
+                                <span class="value" id="soilType">-</span>
+                            </div>
+                            <div class="confidence">
+                                <span class="label">
+                                    <i class="fas fa-percentage" style="margin-right: 0.5rem;"></i>
+                                    Confidence:
+                                </span>
+                                <span class="value" id="soilConfidence">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Environmental Conditions -->
+                <div class="result-card" id="envResult">
+                    <div class="card-header">
+                        <i class="fas fa-globe-americas"></i>
+                        <h4>Environmental Conditions</h4>
+                    </div>
+                    <div class="result-content">
+                        <div class="env-grid" id="envGrid">
+                            <!-- Environment data will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crop Recommendations -->
+                <div class="result-card" id="cropResult">
+                    <div class="card-header">
+                        <i class="fas fa-seedling"></i>
+                        <h4>AI Crop Recommendations</h4>
+                    </div>
+                    <div class="result-content">
+                        <div class="crops-grid" id="cropsGrid">
+                            <!-- Crop recommendations will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Soil-Specific Crops -->
+                <div class="result-card" id="soilSpecificResult">
+                    <div class="card-header">
+                        <i class="fas fa-list-check"></i>
+                        <h4>Soil-Specific Crops</h4>
+                    </div>
+                    <div class="result-content">
+                        <div class="soil-crops" id="soilCrops">
+                            <!-- Soil-specific crops will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>
+                <i class="fas fa-brain" style="margin-right: 0.5rem;"></i>
+                AI is analyzing your soil...
+            </h3>
+            <p>Processing image and generating recommendations</p>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="/frontend/js/script.js"></script>
+</body>
+</html>

@@ -277,14 +277,14 @@ def main():
     """
     # Initialize the recommender
     recommender = CombinedCropSoilRecommender(
-        soil_model_path='model_outputs/soil_classifier_model.keras',
-        crop_model_path='model_outputs/crop_model.pkl',
-        crop_encoder_path='model_outputs/crop_label_encoder.pkl'
+        soil_model_path='../../model_outputs/soil_classifier_model.keras',
+        crop_model_path='../../model_outputs/crop_model.pkl',
+        crop_encoder_path='../../model_outputs/crop_label_encoder.pkl'
     )
     
     # Example 1: Using soil image only
     print("Example 1: Soil Image Analysis")
-    image_path = 'dataset/dummies/black.jpg'  # Replace with your image path
+    image_path = '../../dataset/dummies/black.jpg'  # Replace with your image path
     
     result = recommender.get_comprehensive_recommendation(image_path)
     recommender.print_recommendation(result)

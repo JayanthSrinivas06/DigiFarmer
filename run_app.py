@@ -28,11 +28,11 @@ def check_requirements():
         return False
 
 def start_backend():
-    """Start the FastAPI backend server"""
-    print("🚀 Starting FastAPI backend server...")
+    """Start the CropAI backend server"""
+    print("🚀 Starting CropAI backend server...")
     
-    # Change to backend directory
-    backend_dir = Path(__file__).parent / "backend"
+    # Change to backend/api directory
+    backend_dir = Path(__file__).parent / "backend" / "api"
     os.chdir(backend_dir)
     
     # Start the server
@@ -45,17 +45,17 @@ def start_backend():
             "--reload"
         ], check=True)
     except KeyboardInterrupt:
-        print("\n🛑 Server stopped by user")
+        print("\n🛑 CropAI server stopped by user")
     except Exception as e:
-        print(f"❌ Error starting server: {e}")
+        print(f"❌ Error starting CropAI server: {e}")
 
 def main():
     """Main application entry point"""
-    print("🌱 Crop & Soil Recommendation System")
-    print("=" * 50)
+    print("🌱 CropAI - AI-Powered Agricultural Intelligence")
+    print("=" * 55)
     
     # Check if we're in the right directory
-    if not os.path.exists("backend/main.py"):
+    if not os.path.exists("backend/api/main.py"):
         print("❌ Please run this script from the project root directory")
         return
     
@@ -72,19 +72,21 @@ def main():
     
     missing_models = [f for f in model_files if not os.path.exists(f)]
     if missing_models:
-        print("❌ Missing model files:")
+        print("❌ Missing AI model files:")
         for model in missing_models:
             print(f"   - {model}")
-        print("Please ensure all model files are present before running the application")
+        print("Please ensure all AI model files are present before running CropAI")
         return
     
-    print("✅ All model files found")
+    print("✅ All AI model files found")
+    print("🌐 Starting web server at: http://localhost:8000")
+    print("📚 API documentation at: http://localhost:8000/api/docs")
     
     # Start the backend
     try:
         start_backend()
     except Exception as e:
-        print(f"❌ Failed to start application: {e}")
+        print(f"❌ Failed to start CropAI: {e}")
 
 if __name__ == "__main__":
     main()

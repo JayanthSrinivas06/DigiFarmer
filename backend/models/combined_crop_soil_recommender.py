@@ -114,26 +114,23 @@ class CombinedCropSoilRecommender:
     def get_environmental_parameters(self, soil_type, custom_params=None):
         """
         Get environmental parameters for a given soil type.
-        
-        Args:
-            soil_type: The classified soil type
-            custom_params: Custom environmental parameters (optional)
-            
-        Returns:
-            dict: Environmental parameters
+        Ensures all required keys are present, filling missing ones with defaults.
         """
-        if custom_params:
-            return custom_params
-        
+        required_keys = ['N', 'P', 'K', 'temperature', 'humidity', 'pH', 'rainfall']
         # Get default ranges for the soil type
         ranges = self.soil_environmental_ranges.get(soil_type, {})
-        
         # Generate typical values within the ranges
-        params = {}
-        for param, (min_val, max_val) in ranges.items():
-            # Use middle value of the range as typical
-            params[param] = (min_val + max_val) / 2
-        
+        default_params = {param: (min_val + max_val) / 2 for param, (min_val, max_val) in ranges.items()}
+        if custom_params:
+            # Fill in missing keys from defaults
+            params = {**default_params, **custom_params}
+        else:
+            params = default_params.copy()
+        # Ensure all required keys are present
+        for key in required_keys:
+            if key not in params:
+                # Fallback to 0 if no default is available
+                params[key] = 0
         return params
     
     def recommend_crops(self, soil_type, environmental_params=None, top_n=5):
@@ -170,24 +167,41 @@ class CombinedCropSoilRecommender:
             # Get soil-specific crop recommendations
             soil_specific_crops = self.soil_crop_mapping.get(soil_type, [])
             
-            # Create recommendations with scores
+            # Create recommendations with scores, filter out crops with no name or non-positive score
             recommendations = []
             for i, (crop_name, prob) in enumerate(zip(crop_names, crop_probabilities)):
                 # Boost score if crop is suitable for the soil type
                 soil_boost = 1.5 if crop_name in soil_specific_crops else 1.0
                 adjusted_score = prob * soil_boost
-                
-                recommendations.append({
-                    'crop': crop_name,
-                    'score': adjusted_score,
-                    'soil_suitable': crop_name in soil_specific_crops,
-                    'original_probability': prob
-                })
-            
+                # Only include crops with a valid name and positive score
+                if crop_name and adjusted_score > 0:
+                    recommendations.append({
+                        'crop': crop_name,
+                        'score': adjusted_score,
+                        'soil_suitable': crop_name in soil_specific_crops,
+                        'original_probability': prob
+                    })
             # Sort by adjusted score and return top N
             recommendations.sort(key=lambda x: x['score'], reverse=True)
-            
-            return recommendations[:top_n]
+            top_recommendations = recommendations[:top_n]
+            # If no valid recommendations, return a random soil-specific crop
+            if not top_recommendations:
+                import random
+                soil_specific_crops = self.soil_crop_mapping.get(soil_type, [])
+                if soil_specific_crops:
+                    random_crop = random.choice(soil_specific_crops)
+                    return [{
+                        'crop': random_crop,
+                        'score': 1.0,
+                        'soil_suitable': True,
+                        'original_probability': None
+                    }]
+                
+            print("Top Recommendations:")
+            for rec in top_recommendations:
+                print(f"   {rec['crop'].title()}: {rec['score']:.3f}")
+
+            return top_recommendations
             
         except Exception as e:
             print(f"Error in crop recommendation: {e}")
